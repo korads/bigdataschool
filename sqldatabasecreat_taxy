@@ -1,0 +1,392 @@
+CREATE SCHEMA kors_sch1308 AUTHORIZATION korsikov0611
+GO
+ALTER USER korsikov0611 WITH DEFAULT_SCHEMA=kors_sch1308
+GO
+
+GRANT CONTROL ON SCHEMA :: korsikov0611_sch TO korsikov0611
+GRANT CONTROL ON DATABASE :: sqldwschool TO korsikov0611
+GRANT CONTROL ON SCHEMA :: kors_sch1308 TO korsikov0611
+
+
+
+
+CREATE EXTERNAL FILE FORMAT textkors_comp  WITH
+(
+	FORMAT_TYPE = DELIMITEDTEXT,
+	FORMAT_OPTIONS 
+	(
+		FIELD_TERMINATOR = ',',
+		STRING_DELIMITER = '',		
+	),
+	DATA_COMPRESSION = 'org.apache.hadoop.io.compress.DefaultCodec'
+)
+
+
+-- =========================================
+-- Create external file format template
+-- =========================================
+CREATE EXTERNAL FILE FORMAT textkors_comp  WITH
+(
+	FORMAT_TYPE = DELIMITEDTEXT,
+	FORMAT_OPTIONS 	(FIELD_TERMINATOR = ',', STRING_DELIMITER = '')
+
+)
+
+
+CREATE DATABASE SCOPED CREDENTIAL KorsAzure
+WITH
+  IDENTITY = 'datalakedk' ,
+  SECRET = '+RONpSwrMUwTXeIEz6cPcmlG7ky9dMUuIh+SaBsHqacPMThm95XaAfHQD1//rToLh54BUC/ap90miwxtbsJw9Q==' ;
+  
+GO
+
+
+CREATE EXTERNAL DATA SOURCE korsikov_sorse8
+WITH
+  ( LOCATION = 'https://datalakedk.blob.core.windows.net' ,
+    CREDENTIAL = KorsAzure ,
+    TYPE = HADOOP
+  ) ;
+
+   
+GO
+
+CREATE EXTERNAL TABLE kors_sch1308.yellow_tripdata
+(
+    VendorID  int NULL,
+	tpep_pickup_datetime datetime NULL,
+	tpep_dropoff_datetime datetime NULL,
+	Passenger_count int NULL,
+	Trip_distance float NULL,
+	PULocationID int NULL,
+	DOLocationID int NULL,
+	RateCodeID int NULL,
+	Store_and_fwd_flag char NULL,
+	Payment_typeA  int NULL,
+	Fare_amount float NULL,
+	Extra float NULL,
+	MTA_tax float NULL,
+	Improvement_surcharge float NULL,
+	Tip_amount float NULL,
+	Tolls_amount float NULL,
+	Total_amount float NULL
+
+)
+WITH
+(
+    LOCATION = '/sqldata/yellow_tripdata_2020-01.csv',
+    DATA_SOURCE = korsikov_sorse8,
+    FILE_FORMAT = textkors_comp
+ )
+GO
+
+
+CREATE EXTERNAL DATA SOURCE korsikov_sorse9
+WITH
+  ( LOCATION = 'wasbs://sqldata@datalakedk.blob.core.windows.net' ,
+    CREDENTIAL = KorsAzure ,
+    TYPE = HADOOP
+  ) ;
+
+ 
+GO
+
+CREATE EXTERNAL TABLE kors_sch1308.yellow_tripdata
+(
+    VendorID  int NULL,
+	tpep_pickup_datetime datetime NULL,
+	tpep_dropoff_datetime datetime NULL,
+	Passenger_count int NULL,
+	Trip_distance float NULL,
+	PULocationID int NULL,
+	DOLocationID int NULL,
+	RateCodeID int NULL,
+	Store_and_fwd_flag char NULL,
+	Payment_typeA  int NULL,
+	Fare_amount float NULL,
+	Extra float NULL,
+	MTA_tax float NULL,
+	Improvement_surcharge float NULL,
+	Tip_amount float NULL,
+	Tolls_amount float NULL,
+	Total_amount float NULL
+
+)
+WITH
+(
+    LOCATION = '/sqldata/yellow_tripdata_2020-01.csv',
+    DATA_SOURCE = korsikov_sorse9,
+    FILE_FORMAT = textkors_comp
+ )
+GO
+
+CREATE EXTERNAL DATA SOURCE korsikov_sorse10
+WITH
+  ( LOCATION = 'abfss://sqldata@datalakedk.blob.core.windows.net' ,
+    CREDENTIAL = KorsAzure ,
+    TYPE = HADOOP
+  ) ;
+
+
+
+CREATE EXTERNAL TABLE kors_sch1308.yellow_tripdatakorsikov
+(
+    VendorID  int NULL,
+	tpep_pickup_datetime datetime NULL,
+	tpep_dropoff_datetime datetime NULL,
+	Passenger_count int NULL,
+	Trip_distance float NULL,
+	PULocationID int NULL,
+	DOLocationID int NULL,
+	RateCodeID int NULL,
+	Store_and_fwd_flag char NULL,
+	Payment_typeA  int NULL,
+	Fare_amount float NULL,
+	Extra float NULL,
+	MTA_tax float NULL,
+	Improvement_surcharge float NULL,
+	Tip_amount float NULL,
+	Tolls_amount float NULL,
+	Total_amount float NULL
+
+)
+WITH
+(
+    LOCATION = '/yellow_tripdata_2020-01.csv',
+    DATA_SOURCE = korsikov_sorse10,
+    FILE_FORMAT = textkors_comp
+ )
+GO
+
+
+
+CREATE EXTERNAL TABLE kors_sch1308.korsfinal
+(
+	[VendorID] [int] NULL,
+	[tpep_pickup_datetime] [datetime] NULL,
+	[tpep_dropoff_datetime] [datetime] NULL,
+	[passenger_count] [int] NULL,
+	[trip_distance] [float] NULL,
+	[RatecodeID] [int] NULL,
+	[store_and_fwd_flag] [char](1) NULL,
+	[PULocationID] [int] NULL,
+	[DOLocationID] [int] NULL,
+	[payment_type] [int] NULL,
+	[fare_amount] [float] NULL,
+	[extra] [float] NULL,
+	[mta_tax] [float] NULL,
+	[tip_amount] [float] NULL,
+	[tolls_amount] [float] NULL,
+	[improvement_surcharge] [float] NULL,
+	[total_amount] [float] NULL,
+	[congestion_surcharge] [float] NULL
+)
+WITH (DATA_SOURCE = korsikov_sorse10 ,LOCATION = '/yellow_tripdata_2020-01.csv', FILE_FORMAT = textkors_comp)
+GO
+
+
+CREATE TABLE kors_sch1308.fact_taxifinal
+(
+	[VendorID] [int] NULL,
+	[tpep_pickup_datetime] [datetime] NULL,
+	[tpep_dropoff_datetime] [datetime] NULL,
+	[passenger_count] [int] NULL,
+	[trip_distance] [float] NULL,
+	[RatecodeID] [int] NULL,
+	[store_and_fwd_flag] [char](1) NULL,
+	[PULocationID] [int] NULL,
+	[DOLocationID] [int] NULL,
+	[payment_type] [int] NULL,
+	[fare_amount] [float] NULL,
+	[extra] [float] NULL,
+	[mta_tax] [float] NULL,
+	[tip_amount] [float] NULL,
+	[tolls_amount] [float] NULL,
+	[improvement_surcharge] [float] NULL,
+	[total_amount] [float] NULL,
+	[congestion_surcharge] [float] NULL
+)
+WITH
+(
+	DISTRIBUTION = HASH ( [tpep_pickup_datetime] ),
+	CLUSTERED COLUMNSTORE INDEX
+)
+GO
+
+
+INSERT INTO kors_sch1308.fact_taxifinal
+(
+    [VendorID],
+	[tpep_pickup_datetime],
+	[tpep_dropoff_datetime],
+	[passenger_count],
+	[trip_distance],
+	[RatecodeID],
+	[store_and_fwd_flag],
+	[PULocationID],
+	[DOLocationID],
+	[payment_type],
+	[fare_amount],
+	[extra],
+	[mta_tax],
+	[tip_amount],
+	[tolls_amount],
+	[improvement_surcharge],
+	[total_amount],
+	[congestion_surcharge]
+)
+(SELECT 
+    [VendorID],
+	[tpep_pickup_datetime],
+	[tpep_dropoff_datetime],
+	[passenger_count],
+	[trip_distance],
+	[RatecodeID],
+	[store_and_fwd_flag],
+	[PULocationID],
+	[DOLocationID],
+	[payment_type],
+	[fare_amount],
+	[extra],
+	[mta_tax],
+	[tip_amount],
+	[tolls_amount],
+	[improvement_surcharge],
+	[total_amount],
+	[congestion_surcharge]
+
+FROM kors_sch1308.korsfinal
+)
+
+
+
+
+
+
+
+CREATE TABLE kors_sch1308.vendor
+(
+	[ID] [int] NOT NULL IDENTITY,
+	[Name] [varchar](21) NOT NULL
+	
+)
+WITH
+(
+	DISTRIBUTION = REPLICATE,
+	CLUSTERED COLUMNSTORE INDEX
+)
+GO
+
+CREATE TABLE kors_sch1308.RateCode
+(
+	[ID] [int] NOT NULL IDENTITY,
+	[Name] [varchar](21) NOT NULL
+	
+)
+WITH
+(
+	DISTRIBUTION = REPLICATE,
+	CLUSTERED COLUMNSTORE INDEX
+)
+GO
+
+
+CREATE TABLE kors_sch1308.Payment_type
+(
+	[ID] [int] NOT NULL IDENTITY,
+	[Name] [varchar](21) NOT NULL
+	
+)
+WITH
+(
+	DISTRIBUTION = REPLICATE,
+	CLUSTERED COLUMNSTORE INDEX
+)
+GO
+
+
+
+
+
+INSERT INTO kors_sch1308.vendor
+           ([ID],[Name])
+     VALUES
+           (2, 'VeriFone Inc')
+GO
+SELECT * FROM kors_sch1308.vendor
+
+
+
+
+
+
+INSERT INTO kors_sch1308.RateCode
+           ([ID],[Name])
+     VALUES
+           (1, 'Standard rate' )
+GO
+INSERT INTO kors_sch1308.RateCode
+           ([ID],[Name])
+     VALUES
+           (2, 'JFK')
+GO
+INSERT INTO kors_sch1308.RateCode
+           ([ID],[Name])
+     VALUES
+           (3, 'Newark')
+GO
+INSERT INTO kors_sch1308.RateCode
+           ([ID],[Name])
+     VALUES
+           (4, 'Nassau or Westchester')
+GO
+INSERT INTO kors_sch1308.RateCode
+           ([ID],[Name])
+     VALUES
+           (5, 'Negotiated fare')
+GO
+INSERT INTO kors_sch1308.RateCode
+           ([ID],[Name])
+     VALUES
+           (6, 'Group ride')
+GO
+
+SELECT * FROM kors_sch1308.RateCode
+
+
+
+INSERT INTO kors_sch1308.Payment_type
+           ([ID],[Name])
+     VALUES
+           (1, 'Credit card'
+		    )
+GO
+INSERT INTO kors_sch1308.Payment_type
+           ([ID],[Name])
+     VALUES
+           (2, 'Cash'
+		   )
+GO
+INSERT INTO kors_sch1308.Payment_type
+           ([ID],[Name])
+     VALUES
+           (3, 'No charge')
+GO
+INSERT INTO kors_sch1308.Payment_type
+           ([ID],[Name])
+     VALUES
+           (4, 'Dispute')
+GO
+INSERT INTO kors_sch1308.Payment_type
+           ([ID],[Name])
+     VALUES
+           (5, 'Unknown')
+GO
+INSERT INTO kors_sch1308.Payment_type
+           ([ID],[Name])
+     VALUES
+           (6, 'Voided trip') 
+GO
+SELECT * FROM kors_sch1308.Payment_type
+
+
